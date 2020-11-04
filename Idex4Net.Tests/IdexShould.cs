@@ -45,5 +45,14 @@ namespace Idex4Net.Tests
 
             currencies.IsSuccess.Should().BeTrue();
         }
+
+        [Theory, Conventions]
+        public async Task GetTickers(IdexClient idexClient)
+        {
+            var currencies = await idexClient.GetTickers(CancellationToken.None);
+
+            currencies.IsSuccess.Should().BeTrue();
+        }
+
     }
 }

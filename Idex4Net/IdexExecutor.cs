@@ -15,7 +15,7 @@ namespace Idex4Net
 {
     public class IdexExecutor
     {
-        private const string RestHost = "https://api.idex.market";
+        private const string RestHost = "https://api.idex.io";
         private readonly ApiCredentials _apiCredentials;
 
         public IdexExecutor(ApiCredentials apiCredentials)
@@ -24,9 +24,9 @@ namespace Idex4Net
         }
 
         public async Task<Result<TOut>> Request<TOut>(string url, CancellationToken cancellationToken,
-            object parameters = null, bool isSigned = false)
+            object parameters = null, bool isSigned = false, bool usePost = true)
         {
-            var content = await InnerRequest(url, cancellationToken, isSigned, parameters);
+            var content = await InnerRequest(url, cancellationToken, isSigned, usePost, parameters);
             try
             {
                 if (IsRestError(content, out var error))
@@ -38,7 +38,7 @@ namespace Idex4Net
 
                 return Result<TOut>.Success(result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 var parsingError = new ExchangeError(ExchangeErrorType.ParsingError, content);
                 return Result<TOut>.Failed(parsingError);
@@ -46,6 +46,7 @@ namespace Idex4Net
         }
 
         private async Task<string> InnerRequest(string url, CancellationToken cancellationToken, bool isSigned,
+            bool usePost,
             object parameters)
         {
             if (parameters == null)
@@ -61,7 +62,7 @@ namespace Idex4Net
                 client.DefaultRequestHeaders.Add("API-KEY", _apiCredentials.ApiKey);
             }
 
-            var response = await client.PostAsJsonAsync($"{RestHost}{url}", parameters, cancellationToken);
+            var response = await client.PostAsJsonAsync($"{RestHost}{url}", parameters, usePost, cancellationToken);
             var content = await response.Content.ReadAsStringAsync();
             return content;
         }

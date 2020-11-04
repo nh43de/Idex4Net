@@ -22,6 +22,11 @@ namespace Idex4Net
             _cache = new IdexClientCache();
         }
 
+        public Task<Result<Ticker[]>> GetTickers(CancellationToken cancellationToken)
+        {
+            return _idexExecutor.Request<Ticker[]>("/v1/tickers", cancellationToken, null, false, false);
+        }
+
         public Task<Result<IdexContractAddress>> GetContractAddress(CancellationToken cancellationToken)
         {
             return _idexExecutor.Request<IdexContractAddress>("/returnContractAddress", cancellationToken);
@@ -162,6 +167,8 @@ namespace Idex4Net
             return parameters;
         }
 
+
+
         public Task<Result<Dictionary<string, Balance>>> GetBalances(CancellationToken cancellationToken)
         {
             var parameters = new Dictionary<string, object> {["address"] = _apiCredentials.WalletAddress};
@@ -219,5 +226,8 @@ namespace Idex4Net
         {
             return (BigInteger) (amount * power);
         }
+
+
+
     }
 }
